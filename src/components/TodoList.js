@@ -2,19 +2,19 @@ import React from 'react';
 
 function TodoList({ todos, deleteTodo }) {
     return (
-      <div>
-        <h2>To-Do List</h2>
+      <section className="todo-list">
+        <h2>Items on Your To-do List</h2>
         {todos.length === 0 ? (
-          <p>You have no to-do's in your list</p>
+          <p className="todo-list-message">You have no to-do's in your list</p>
         ) : (
           todos.map((todo, index) => (
-            <div key={index}>
-              {todo}
-              <button onClick={() => deleteTodo(index)}>Delete</button>
-            </div>
+              <li key={index} className="todo-list-item">
+                {todo}
+                <button onClick={() => deleteTodo(index)} className="todo-list-action">Delete</button>
+              </li>
           ))
         )}
-      </div>
+      </section>
     );
   }
 
