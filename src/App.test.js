@@ -1,36 +1,34 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from './App';
 
-test('renders the todo form', () => {
-  const { getByLabelText } = render(<App />);
-  const inputElement = getByLabelText(/New To-Do List Item/i);
-  expect(inputElement).toBeInTheDocument();
-});
+describe('App', () => {
+  test('renders TodoForm and TodoList components', () => {
+    render(<App />);
+    const todoFormElement = screen.getByRole('textbox', { class: 'todo-form-input' });
+    const todoListElement = screen.getByRole('heading', { class: 'todo-list-title'});
+    expect(todoFormElement).toBeInTheDocument();
+    expect(todoListElement).toBeInTheDocument();
+  });
 
-test('allows users to add a todo', () => {
-  const { getByLabelText, getByText, getByRole } = render(<App />);
-  const inputElement = getByLabelText(/New To-Do List Item/i);
-  const addButton = getByRole('button', { name: /Add To-do/i });
+  test('adds a new todo to the list', () => {
+    render(<App />);
+    const todoInputElement = screen.getByRole('textbox', { class: 'todo-form-input' });
+    const addButtonElement = screen.getByRole('button', { class: 'todo-form-action' });
+    fireEvent.change(todoInputElement, { target: { value: 'Buy milk' } });
+    fireEvent.click(addButtonElement);
+    const todoListElement = screen.getByRole('list', { class: 'todo-list-items' });
+    expect(todoListElement).toHaveTextContent('Buy milk');
+  });
 
-  fireEvent.change(inputElement, { target: { value: 'Test Todo' } });
-  fireEvent.click(addButton);
-
-  const todoItem = getByText('Test Todo');
-  expect(todoItem).toBeInTheDocument();
-});
-
-test('allows users to delete a todo', () => {
-  const { getByLabelText, getByText, getByRole } = render(<App />);
-  const inputElement = getByLabelText(/New To-Do List Item/i);
-  const addButton = getByRole('button', { name: /Add To-do/i });
-
-  // Add a todo
-  fireEvent.change(inputElement, { target: { value: 'Test Todo' } });
-  fireEvent.click(addButton);
-
-  const deleteButton = getByText('Delete');
-  fireEvent.click(deleteButton);
-
-  expect(() => getByText('Test Todo')).toThrow();
+  test('deletes a todo from the list', () => {
+    render(<App />);
+    const todoInputElement = screen.getByRole('textbox', { class: 'todo-form-input' });
+    const addButtonElement = screen.getAllByRole('button', { class: 'todo-form-action' })[0];
+    fireEvent.change(todoInputElement, { target: { value: 'Buy milk' } });
+    fireEvent.click(addButtonElement);
+    const deleteButtonElement = screen.queryAllByRole('button', { class: 'todo-list-action' })[0];
+    fireEvent.click(deleteButtonElement);
+    const todoListElement = screen.getByRole('list', { class: 'todo-list-items' });
+    expect(todoListElement).not.toHaveTextContent('Buy milk');
+  });
 });
